@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const Portfolio = require("../models/Portfolio");
 
 const registerUser = async (req, res) => {
   try {
@@ -22,6 +23,10 @@ const registerUser = async (req, res) => {
       name,
       email,
       password: hashedPassword,
+    });
+
+    await Portfolio.create({
+      userId: user._id,
     });
 
     res.status(201).json({

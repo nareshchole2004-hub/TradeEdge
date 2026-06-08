@@ -3,12 +3,17 @@ import axios from "axios";
 
 function Dashboard() {
   const [summary, setSummary] = useState(null);
+  const [trades, setTrades] = useState([]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    window.location.href = "/";
+  };
 
   useEffect(() => {
     const fetchSummary = async () => {
       try {
-        const token =
-          localStorage.getItem("token");
+        const token = localStorage.getItem("token");
 
         if (!token) {
           window.location.href = "/";
@@ -26,6 +31,16 @@ function Dashboard() {
 
         setSummary(res.data);
 
+        const tradesRes = await axios.get(
+          "http://localhost:5000/api/trades",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        setTrades(tradesRes.data);
       } catch (error) {
         console.error(error);
       }
@@ -37,9 +52,18 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-slate-950 text-white p-8">
 
-      <h1 className="text-4xl font-bold text-green-500 mb-8">
-        TradeEdge Dashboard
-      </h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-4xl font-bold text-green-500">
+          TradeEdge
+        </h1>
+
+        <button
+          onClick={handleLogout}
+          className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg font-semibold"
+        >
+          Logout
+        </button>
+      </div>
 
       {summary && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -69,7 +93,13 @@ function Dashboard() {
               Total PnL
             </h2>
 
-            <p className="text-3xl font-bold">
+            <p
+              className={`text-3xl font-bold ${
+                summary.totalPnL >= 0
+                  ? "text-green-500"
+                  : "text-red-500"
+              }`}
+            >
               ₹{summary.totalPnL}
             </p>
           </div>
@@ -89,7 +119,7 @@ function Dashboard() {
               Open Trades
             </h2>
 
-            <p className="text-3xl font-bold">
+            <p className="text-3xl font-bold text-green-500">
               {summary.openTrades}
             </p>
           </div>
@@ -99,13 +129,80 @@ function Dashboard() {
               Closed Trades
             </h2>
 
-            <p className="text-3xl font-bold">
+            <p className="text-3xl font-bold text-red-500">
               {summary.closedTrades}
             </p>
           </div>
 
         </div>
       )}
+
+      <div className="mt-10">
+        <h2 className="text-2xl font-bold mb-4">
+          Recent Trades
+        </h2>
+
+        <div className="overflow-x-auto">
+
+          <table className="w-full bg-slate-900 rounded-xl overflow-hidden">
+
+            <thead>
+              <tr className="bg-slate-800">
+                <th className="p-3 text-left">
+                  Symbol
+                </th>
+
+                <th className="p-3 text-left">
+                  Qty
+                </th>
+
+                <th className="p-3 text-left">
+                  Buy Price
+                </th>
+
+                <th className="p-3 text-left">
+                  Status
+                </th>
+              </tr>
+            </thead>
+
+            <tbody>
+
+              {trades.map((trade) => (
+                <tr
+                  key={trade._id}
+                  className="border-b border-slate-800"
+                >
+                  <td className="p-3">
+                    {trade.symbol}
+                  </td>
+
+                  <td className="p-3">
+                    {trade.quantity}
+                  </td>
+
+                  <td className="p-3">
+                    ₹{trade.buyPrice}
+                  </td>
+
+                  <td
+                    className={`p-3 font-semibold ${
+                      trade.status === "OPEN"
+                        ? "text-green-500"
+                        : "text-red-500"
+                    }`}
+                  >
+                    {trade.status}
+                  </td>
+                </tr>
+              ))}
+
+            </tbody>
+
+          </table>
+
+        </div>
+      </div>
 
     </div>
   );

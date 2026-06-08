@@ -65,8 +65,10 @@ const sellTrade = async (req, res) => {
   try {
     const { tradeId, sellPrice } = req.body;
 
-    const trade = await Trade.findById(tradeId);
-
+    const trade = await Trade.findOne({
+      _id: tradeId,
+      userId: req.user.id,
+    });
     if (!trade) {
       return res.status(404).json({
         message: "Trade not found",

@@ -28,6 +28,16 @@ const tradeSchema = new mongoose.Schema(
       required: true,
     },
 
+    sellPrice: {
+      type: Number,
+      default: 0,
+    },
+
+    realizedPnL: {
+      type: Number,
+      default: 0,
+    },
+
     status: {
       type: String,
       enum: ["OPEN", "CLOSED"],
@@ -36,7 +46,7 @@ const tradeSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 module.exports = mongoose.model("Trade", tradeSchema);

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
 
 function Search() {
   const [search, setSearch] = useState("");
@@ -23,7 +24,11 @@ function Search() {
   );
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white p-8">
+    <div className="min-h-screen bg-slate-950 text-white">
+
+    <Navbar />
+
+    <div className="p-8">
       <h1 className="text-4xl font-bold text-green-500 mb-8">Search Stocks</h1>
 
       <input
@@ -45,6 +50,7 @@ function Search() {
           </div>
         ))}
       </div>
+    </div>
     </div>
   );
 }
